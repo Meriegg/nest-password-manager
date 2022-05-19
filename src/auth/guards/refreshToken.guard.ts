@@ -1,4 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Request, Response } from 'express'
 import { EncryptionService } from 'src/encryption/encryption.service'
@@ -20,7 +26,7 @@ export class RefreshTokenGuard implements CanActivate {
 
       // Check if token exists
       if (!token) {
-        return false
+        throw new HttpException('No refresh token!', HttpStatus.UNAUTHORIZED)
       }
 
       // Verify and decode the token
@@ -28,7 +34,7 @@ export class RefreshTokenGuard implements CanActivate {
 
       // Check if the token is a refresh token
       if (!decoded.isRefresh) {
-        return false
+        throw new HttpException('Refresh token is not valid', HttpStatus.UNAUTHORIZED)
       }
 
       // Check if the token is expired
@@ -43,7 +49,7 @@ export class RefreshTokenGuard implements CanActivate {
           },
         })
 
-        return false
+        throw new HttpException('Refresh token invalid', HttpStatus.UNAUTHORIZED)
       }
 
       // Set the user id from the token
@@ -59,12 +65,12 @@ export class RefreshTokenGuard implements CanActivate {
       const decryptedRefreshToken = this.crypto.decrypt(databaseUser.refreshToken)
 
       if (token !== decryptedRefreshToken) {
-        return false
+        throw new HttpException('Refresh token invalid', HttpStatus.UNAUTHORIZED)
       }
 
       return true
     } catch (error) {
-      return false
+      throw error
     }
   }
 }

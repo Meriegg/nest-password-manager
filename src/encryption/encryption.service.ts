@@ -22,7 +22,9 @@ export class EncryptionService {
     return hash
   }
 
-  encrypt(data: string): string {
+  encrypt(data: string): string | null {
+    if (!data) return null
+
     // Create the initial vector
     const iv = randomBytes(16).toString('hex')
 
@@ -44,7 +46,9 @@ export class EncryptionService {
     return finalCipher
   }
 
-  decrypt(data: string): string {
+  decrypt(data: string): string | null {
+    if (!data) return null
+
     // Get the initial vector from the data
     const iv = data.split(':')[1]
 

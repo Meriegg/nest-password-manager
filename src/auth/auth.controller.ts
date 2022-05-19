@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -11,7 +12,7 @@ import {
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
 import { Request, Response } from 'express'
-import { RefreshTokenGuard } from './guards'
+import { AuthorizationGuard, RefreshTokenGuard } from './guards'
 
 @Controller('auth')
 export class AuthController {
@@ -28,8 +29,14 @@ export class AuthController {
     return this.authService.register(body, res)
   }
 
+  @UseGuards(AuthorizationGuard)
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    return this.authService.logout(res)
+  }
+
   @UseGuards(RefreshTokenGuard)
-  @Post('refreshToken')
+  @Get('refreshToken')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     return this.authService.refreshToken(req, res)

@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   private createAccessToken(id: string): string {
-    const token = this.jwt.sign({ id }, { expiresIn: '15min' })
+    const token = this.jwt.sign({ id }, { expiresIn: '5min' })
 
     return token
   }
@@ -92,6 +92,8 @@ export class AuthService {
     res.cookie('refreshToken', refreshToken.token, {
       httpOnly: true,
       expires: refreshToken.cookieExpire,
+      path: '/',
+      domain: 'localhost',
     })
 
     delete finalUser.password
@@ -137,6 +139,16 @@ export class AuthService {
 
       throw new HttpException('Something went wrong', HttpStatus.BAD_REQUEST)
     }
+  }
+
+  async logout(res: Response) {
+    // Delete the refresh token from database
+    await this.deleteRefreshTokenInDb(res.locals.userId)
+
+    // Delete refresh token cookie
+    res.clearCookie('refreshToken')
+
+    return { message: 'Logged out successfully!' }
   }
 
   async refreshToken(req: Request, res: Response) {

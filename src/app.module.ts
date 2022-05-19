@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module'
 import { EncryptionModule } from './encryption/encryption.module'
 import { PasswordModule } from './password/password.module'
 import { PrismaModule } from './prisma/prisma.module'
+import { UserModule } from './user/user.module'
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { PrismaModule } from './prisma/prisma.module'
     PrismaModule,
     EncryptionModule,
     PasswordModule,
+    UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
